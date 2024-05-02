@@ -12,6 +12,33 @@
                 <van-cell title="清空列表" @click="clearStore" />
             </van-cell-group>
         </div>
+
+        <div class="add-salary clear-all">
+            <van-cell-group inset>
+                <van-cell title="增加记录" @click="showPopUp" />
+            </van-cell-group>
+            <van-popup v-model:show="popShow" position="bottom" :style="{ padding: '16px' }">
+                <van-cell-group inset>
+                    <!-- 年 -->
+                    <van-field v-model="yearNumber" label="年" />
+                    <!-- 月 -->
+                    <van-field v-model="monthNumber" label="月" />
+                    <!-- 日 -->
+                    <van-field v-model="dayNumber" label="日" />
+                    <!-- 退房数 -->
+                    <van-field v-model="checkOutNumber" label="退房数" />
+                    <!-- 续住数 -->
+                    <van-field v-model="extendStayNumber" label="续住数" />
+                    <!-- 退房单价 -->
+                    <van-field v-model="checkOutPrice" label="退房单价" />
+                    <!-- 续住单价 -->
+                    <van-field v-model="extendStayPrice" label="续住单价" />
+                </van-cell-group>
+
+                <van-button type="primary" block @click="addSalary">添加</van-button>
+            </van-popup>
+
+        </div>
         <!-- 数字键盘 -->
         <van-number-keyboard :show="show" @blur="show = false" @input="onInput" @delete="onDelete" @show="reShowNumber"
             @hide="clearNumber" @close="clearNumber" />
@@ -74,6 +101,27 @@ const resetStore = () => {
     checkOut.value = 0;
     extendStay.value = 0;
 };
+const popShow = ref(false);
+const showPopUp = () => {
+    popShow.value = true;
+};
+
+const yearNumber = ref('');
+const monthNumber = ref('');
+const dayNumber = ref('');
+const checkOutNumber = ref('');
+const extendStayNumber = ref('');
+const checkOutPrice = ref('12');
+const extendStayPrice = ref('6');
+
+// 添加工资记录
+const addSalary = () => {
+    let date = yearNumber.value + ' 年 ' + monthNumber.value + ' 月 ' + dayNumber.value + ' 日';
+    let salary = Number(checkOutNumber.value) * Number(checkOutPrice.value) + Number(extendStayNumber.value) * Number(extendStayPrice.value);
+    currentSalary.addDaySalary({ date, salary });
+    popShow.value = false;
+};
+
 </script>
     
 <style scoped lang="less">
