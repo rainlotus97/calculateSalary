@@ -106,7 +106,7 @@ const showPopUp = () => {
     popShow.value = true;
 };
 
-const yearNumber = ref('');
+const yearNumber = ref(new Date().getFullYear() + '');
 const monthNumber = ref('');
 const dayNumber = ref('');
 const checkOutNumber = ref('');
