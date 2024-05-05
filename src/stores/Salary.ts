@@ -10,7 +10,8 @@ export const salaryStore = defineStore('salary', {
             extendNum: 0,
             checkOutSalary: 0,
             extendSalary: 0,
-            daySalaryList: reactive([] as SalaryState[])
+            daySalaryList: reactive([] as SalaryState[]),
+            date: ''
         }
     },
     actions: {
@@ -28,9 +29,14 @@ export const salaryStore = defineStore('salary', {
         },
         addDaySalary(daySalary: SalaryState) {
             // 如果存在相同的数据，则保留最新的数据
-            const index = this.daySalaryList.findIndex(item => item.date === daySalary.date)
+            const index = this.daySalaryList.findIndex(item => item.date.trim() === daySalary.date.trim())
+            console.log('current daySalaryList in list index is: ', index);
             if (index !== -1) {
-                this.daySalaryList.splice(index, 1, daySalary)
+                if (daySalary.salary === 0) {
+                    this.daySalaryList.splice(index, 1)
+                } else {
+                    this.daySalaryList.splice(index, 1, daySalary)
+                }
             } else {
                 this.daySalaryList.push(daySalary)
             }
@@ -58,12 +64,15 @@ export const salaryStore = defineStore('salary', {
         resetTotal() {
             this.checkOutNum = 0
             this.extendNum = 0
+        },
+        setDate(date: string) {
+            this.date = date
         }
     },
     persist: {
         key: 'salary',
         storage: localStorage,
-        paths: ['checkOutNum', 'extendNum', 'checkOutSalary', 'extendSalary', 'daySalaryList']
+        paths: ['checkOutNum', 'extendNum', 'checkOutSalary', 'extendSalary', 'daySalaryList', 'date']
     }
 
 })

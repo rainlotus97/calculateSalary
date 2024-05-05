@@ -104,6 +104,13 @@ const calculateSalary = () => {
 };
 
 onMounted(() => {
+    let currentDate = getCurrentTime();
+    if (currentSalaryStore.date !== currentDate) {
+        currentSalaryStore.resetTotal();
+        checkOut.value = 0;
+        extendStay.value = 0;
+        currentSalaryStore.setDate(currentDate);
+    }
     calculateSalary();
 });
 
@@ -120,7 +127,7 @@ const getCurrentTime = () => {
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
     const day = date.getDate();
-    return `${year} 年 ${month} 月 ${day} 日 `;
+    return `${year} 年 ${month} 月 ${day} 日`;
 };
 </script>
     

@@ -114,11 +114,15 @@ const extendStayNumber = ref('');
 const checkOutPrice = ref('12');
 const extendStayPrice = ref('6');
 
-// 添加工资记录
+// 添加/删除工资记录
 const addSalary = () => {
     let date = yearNumber.value + ' 年 ' + monthNumber.value + ' 月 ' + dayNumber.value + ' 日';
     let salary = Number(checkOutNumber.value) * Number(checkOutPrice.value) + Number(extendStayNumber.value) * Number(extendStayPrice.value);
-    currentSalary.addDaySalary({ date, salary });
+    if (salary === 0) {
+        currentSalary.deleteDaySalary(date);
+    } else {
+        currentSalary.addDaySalary({ date, salary });
+    }
     popShow.value = false;
 };
 
