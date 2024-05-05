@@ -47,7 +47,7 @@ export const salaryStore = defineStore('salary', {
         },
         deleteDaySalary(date: string) {
             // 删除指定日期的数据
-            const index = this.daySalaryList.findIndex(item => item.date === date)
+            const index = this.daySalaryList.findIndex(item => item.date.trim() === date.trim())
             if (index !== -1) {
                 this.daySalaryList.splice(index, 1)
             }

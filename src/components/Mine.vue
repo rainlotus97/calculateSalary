@@ -16,6 +16,7 @@
         <div class="add-salary clear-all">
             <van-cell-group inset>
                 <van-cell title="增加记录" @click="showPopUp" />
+                <van-cell title="删除记录" @click="deletePop" />
             </van-cell-group>
             <van-popup v-model:show="popShow" position="bottom" :style="{ padding: '16px' }">
                 <van-cell-group inset>
@@ -36,6 +37,19 @@
                 </van-cell-group>
 
                 <van-button type="primary" block @click="addSalary">添加</van-button>
+            </van-popup>
+
+            <van-popup v-model:show="popShow2" position="bottom" :style="{ padding: '16px' }">
+                <van-cell-group inset>
+                    <!-- 年 -->
+                    <van-field v-model="yearNumber1" label="年" />
+                    <!-- 月 -->
+                    <van-field v-model="monthNumber1" label="月" />
+                    <!-- 日 -->
+                    <van-field v-model="dayNumber1" label="日" />
+                </van-cell-group>
+
+                <van-button type="danger" block @click="deleteSalary">删除</van-button>
             </van-popup>
 
         </div>
@@ -106,6 +120,11 @@ const showPopUp = () => {
     popShow.value = true;
 };
 
+const popShow2 = ref(false);
+const deletePop = () => {
+    popShow2.value = true;
+};
+
 const yearNumber = ref(new Date().getFullYear() + '');
 const monthNumber = ref('');
 const dayNumber = ref('');
@@ -124,6 +143,15 @@ const addSalary = () => {
         currentSalary.addDaySalary({ date, salary });
     }
     popShow.value = false;
+};
+
+const yearNumber1 = ref(new Date().getFullYear() + '');
+const monthNumber1 = ref('');
+const dayNumber1 = ref('');
+const deleteSalary = () => {
+    let date = yearNumber1.value + ' 年 ' + monthNumber1.value + ' 月 ' + dayNumber1.value + ' 日';
+    currentSalary.deleteDaySalary(date);
+    popShow2.value = false;
 };
 
 </script>
