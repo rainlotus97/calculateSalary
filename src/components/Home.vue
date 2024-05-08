@@ -135,6 +135,7 @@ const getCurrentTime = () => {
 <style lang="less">
 .home {
     height: 100%;
+    overflow: hidden;
 
     .current_time {
         font-size: 30px;

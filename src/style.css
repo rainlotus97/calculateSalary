@@ -8,7 +8,6 @@ div {
 body{
   background-color: #eff2f5;
   height: 100vh;
-  padding-top: 20px;
 }
 ::-webkit-scrollbar {
   display: none;

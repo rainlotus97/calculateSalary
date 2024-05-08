@@ -170,9 +170,9 @@ const selectMonth = (text: string) => {
 
     .show-list {
         margin-top: 16px;
-        height: calc(100vh - 240px);
         overflow: auto;
-
+        height: calc(100vh - 258px);
+        padding-bottom: 16px;
         .show-item {
             margin-top: 16px;
         }

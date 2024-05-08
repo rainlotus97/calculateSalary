@@ -37,4 +37,9 @@ const active = ref(1);
   </div>
 </template>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.container {
+  padding-top: 20px;
+  height: calc(100vh - var(--van-tabbar-height));
+}
+</style>
