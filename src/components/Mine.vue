@@ -4,6 +4,7 @@
             <van-cell-group inset>
                 <van-cell title="退房单价" :value="checkOut + ' 元'" @click="editCheckOut('checkOut')" />
                 <van-cell title="续住单价" :value="extendStay + ' 元'" @click="editCheckOut('extendStay')" />
+                <van-cell title="餐补单价" :value="foodPrice + ' 元'" @click="editCheckOut('foodPrice')" />
             </van-cell-group>
         </div>
         <div class="clear-all">
@@ -60,13 +61,13 @@
 </template>
     
 <script setup lang='ts'>
-// import { onMounted } from 'vue';
 import { salaryStore } from '@/stores/Salary';
 import { ref } from 'vue';
 const currentSalary = salaryStore();
 
 const checkOut = ref(currentSalary.checkOutSalary);
 const extendStay = ref(currentSalary.extendSalary);
+const foodPrice = ref(currentSalary.foodPrice || 0);
 
 let currentEdit = 'checkOut';
 
@@ -90,9 +91,12 @@ const calculateSalary = () => {
     if (currentEdit === 'checkOut') {
         checkOut.value = Number(currentInputStr);
         currentSalary.setCheckOutSalary(Number(currentInputStr));
-    } else {
+    } else if (currentEdit === 'extendStay') {
         extendStay.value = Number(currentInputStr);
         currentSalary.setExtendSalary(Number(currentInputStr));
+    } else {
+        foodPrice.value = Number(currentInputStr);
+        currentSalary.setFoodPrice(Number(currentInputStr));
     }
 };
 
@@ -102,8 +106,10 @@ const clearNumber = () => {
 const reShowNumber = () => {
     if (currentEdit === 'checkOut') {
         currentInputStr = checkOut.value + '';
-    } else {
+    } else if (currentEdit === 'extendStay') {
         currentInputStr = extendStay.value + '';
+    } else {
+        currentInputStr = foodPrice.value + '';
     }
 };
 
@@ -114,6 +120,7 @@ const resetStore = () => {
     currentSalary.reset();
     checkOut.value = 0;
     extendStay.value = 0;
+    foodPrice.value = 0;
 };
 const popShow = ref(false);
 const showPopUp = () => {

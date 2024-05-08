@@ -10,6 +10,7 @@ export const salaryStore = defineStore('salary', {
             extendNum: 0,
             checkOutSalary: 0,
             extendSalary: 0,
+            foodPrice: 0,
             daySalaryList: reactive([] as SalaryState[]),
             date: ''
         }
@@ -26,6 +27,9 @@ export const salaryStore = defineStore('salary', {
         },
         setExtendSalary(extendSalary: number) {
             this.extendSalary = extendSalary
+        },
+        setFoodPrice(foodPrice: number) {
+            this.foodPrice = foodPrice
         },
         addDaySalary(daySalary: SalaryState) {
             // 如果存在相同的数据，则保留最新的数据
@@ -60,6 +64,7 @@ export const salaryStore = defineStore('salary', {
         reset() {
             this.checkOutSalary = 0
             this.extendSalary = 0
+            this.foodPrice = 0
         },
         resetTotal() {
             this.checkOutNum = 0
@@ -72,7 +77,7 @@ export const salaryStore = defineStore('salary', {
     persist: {
         key: 'salary',
         storage: localStorage,
-        paths: ['checkOutNum', 'extendNum', 'checkOutSalary', 'extendSalary', 'daySalaryList', 'date']
+        paths: ['checkOutNum', 'extendNum', 'checkOutSalary', 'extendSalary', 'daySalaryList', 'date', 'foodPrice']
     }
 
 })

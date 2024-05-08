@@ -18,7 +18,7 @@
 
         <div class="show-list">
             <div class="show-item" v-for="item, index in currentList" :key="index">
-                <van-cell-group>
+                <van-cell-group inset>
                     <van-cell title="日期" :value="item.date" />
                     <van-cell title="工资" :value="item.salary + ' 元'" />
                 </van-cell-group>

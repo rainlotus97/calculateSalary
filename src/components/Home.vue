@@ -95,7 +95,7 @@ const calculateSalary = () => {
         console.log('没有记录工资，无需计算');
         return;
     }
-    currentSalary.value = checkOut.value * checkOutPrice + extendStay.value * extendStayPrice;
+    currentSalary.value = checkOut.value * checkOutPrice + extendStay.value * extendStayPrice + currentSalaryStore.foodPrice || 0;
     let daliySalary: SalaryState = {
         date: getCurrentTime(),
         salary: currentSalary.value
