@@ -35,6 +35,8 @@
                     <van-field v-model="checkOutPrice" label="退房单价" />
                     <!-- 续住单价 -->
                     <van-field v-model="extendStayPrice" label="续住单价" />
+                    <!-- 餐补单价 -->
+                    <van-field v-model="foodExtendPrice" label="餐补单价" />
                 </van-cell-group>
 
                 <van-button type="primary" block @click="addSalary">添加</van-button>
@@ -139,11 +141,12 @@ const checkOutNumber = ref('');
 const extendStayNumber = ref('');
 const checkOutPrice = ref('12');
 const extendStayPrice = ref('6');
+const foodExtendPrice = ref('15');
 
 // 添加/删除工资记录
 const addSalary = () => {
     let date = yearNumber.value + ' 年 ' + monthNumber.value + ' 月 ' + dayNumber.value + ' 日';
-    let salary = Number(checkOutNumber.value) * Number(checkOutPrice.value) + Number(extendStayNumber.value) * Number(extendStayPrice.value);
+    let salary = Number(checkOutNumber.value) * Number(checkOutPrice.value) + Number(extendStayNumber.value) * Number(extendStayPrice.value)+Number(foodExtendPrice.value);
     if (salary === 0) {
         currentSalary.deleteDaySalary(date);
     } else {
