@@ -12,7 +12,7 @@
                 <span>总出勤：</span> <span>{{ totalDays }} 天</span>
             </div>
             <div class="total-item">
-                <span>总工资：</span> <span>{{ totalSalary }} 元</span>
+                <span>总工资：</span> <span>{{ totalSalaryAll }} 元</span>
             </div>
         </div>
 
@@ -20,7 +20,7 @@
             <div class="show-item" v-for="item, index in currentList" :key="index">
                 <van-cell-group inset>
                     <van-cell title="日期" :value="item.date" />
-                    <van-cell title="工资" :value="item.salary + ' 元'" />
+                    <van-cell title="工资" :value="item.salary + currentSalary.foodPrice || 0 + ' 元'" />
                 </van-cell-group>
             </div>
         </div>
@@ -45,7 +45,7 @@ const showList = reactive([
 ]);
 
 const totalDays = ref(0);
-const totalSalary = ref(0);
+const totalSalaryAll = ref(0);
 const currentList = reactive<SalaryState[]>([]);
 
 const selectOne = (item: any) => {
@@ -54,7 +54,7 @@ const selectOne = (item: any) => {
     });
     item.select = true;
     totalDays.value = 0;
-    totalSalary.value = 0;
+    totalSalaryAll.value = 0;
     currentList.length = 0;
     selectMonth(item.text);
 };
@@ -93,7 +93,7 @@ const selectMonth = (text: string) => {
         daySalaryList.forEach((item: SalaryState) => {
             currenDatetList.push(item);
             totalDays.value += 1;
-            totalSalary.value += item.salary;
+            totalSalaryAll.value += item.salary + currentSalary.foodPrice || 0;
         });
     }
     else if (text === '本月工资' || text === '上月工资') {
@@ -103,7 +103,7 @@ const selectMonth = (text: string) => {
             if (item.date.includes(dateKey)) {
                 currenDatetList.push(item);
                 totalDays.value += 1;
-                totalSalary.value += item.salary;
+                totalSalaryAll.value += item.salary + currentSalary.foodPrice || 0;
             }
         });
     }
@@ -113,7 +113,7 @@ const selectMonth = (text: string) => {
             if (calculateDateSort(item.date) >= calculateDateSort(dateKey)) {
                 currenDatetList.push(item);
                 totalDays.value += 1;
-                totalSalary.value += item.salary;
+                totalSalaryAll.value += item.salary + currentSalary.foodPrice || 0;
             }
         });
     }

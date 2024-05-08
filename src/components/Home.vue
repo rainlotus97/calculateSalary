@@ -15,7 +15,7 @@
         <!-- 今日工资 -->
         <div class="main_title">
             <van-cell-group inset>
-                <van-cell title="今日工资" :value="currentSalary + ' 元'" />
+                <van-cell title="今日工资" :value="currentSalary + currentSalaryStore.foodPrice + ' 元'" />
             </van-cell-group>
         </div>
 
@@ -95,7 +95,7 @@ const calculateSalary = () => {
         console.log('没有记录工资，无需计算');
         return;
     }
-    currentSalary.value = checkOut.value * checkOutPrice + extendStay.value * extendStayPrice + currentSalaryStore.foodPrice || 0;
+    currentSalary.value = checkOut.value * checkOutPrice + extendStay.value * extendStayPrice;
     let daliySalary: SalaryState = {
         date: getCurrentTime(),
         salary: currentSalary.value
