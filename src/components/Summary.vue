@@ -20,7 +20,7 @@
             <div class="show-item" v-for="item, index in currentList" :key="index">
                 <van-cell-group inset>
                     <van-cell title="日期" :value="item.date" />
-                    <van-cell title="工资" :value="item.salary + currentSalary.foodPrice || 0 + ' 元'" />
+                    <van-cell title="工资" :value="item.salary + item.extraPrice || 0 + ' 元'" />
                 </van-cell-group>
             </div>
         </div>
@@ -93,7 +93,8 @@ const selectMonth = (text: string) => {
         daySalaryList.forEach((item: SalaryState) => {
             currenDatetList.push(item);
             totalDays.value += 1;
-            totalSalaryAll.value += item.salary + currentSalary.foodPrice || 0;
+            item.extraPrice = item.extraPrice || currentSalary.foodPrice || 0;
+            totalSalaryAll.value += item.salary + item.extraPrice;
         });
     }
     else if (text === '本月工资' || text === '上月工资') {
@@ -103,7 +104,8 @@ const selectMonth = (text: string) => {
             if (item.date.includes(dateKey)) {
                 currenDatetList.push(item);
                 totalDays.value += 1;
-                totalSalaryAll.value += item.salary + currentSalary.foodPrice || 0;
+                item.extraPrice = item.extraPrice || currentSalary.foodPrice || 0;
+                totalSalaryAll.value += item.salary + item.extraPrice;
             }
         });
     }
@@ -113,7 +115,8 @@ const selectMonth = (text: string) => {
             if (calculateDateSort(item.date) >= calculateDateSort(dateKey)) {
                 currenDatetList.push(item);
                 totalDays.value += 1;
-                totalSalaryAll.value += item.salary + currentSalary.foodPrice || 0;
+                item.extraPrice = item.extraPrice || currentSalary.foodPrice || 0;
+                totalSalaryAll.value += item.salary + item.extraPrice;
             }
         });
     }

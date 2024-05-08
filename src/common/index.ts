@@ -1,6 +1,7 @@
 export interface SalaryState {
     date: string;
     salary: number;
+    extraPrice: number;
 }
 
 // 根据字符串转化为日期进行排序

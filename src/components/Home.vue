@@ -98,7 +98,8 @@ const calculateSalary = () => {
     currentSalary.value = checkOut.value * checkOutPrice + extendStay.value * extendStayPrice;
     let daliySalary: SalaryState = {
         date: getCurrentTime(),
-        salary: currentSalary.value
+        salary: currentSalary.value,
+        extraPrice: currentSalaryStore.foodPrice,
     }
     currentSalaryStore.addDaySalary(daliySalary);
 };
