@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import Summary from '@/components/Summary.vue';
-import Home from '@/components/Home.vue';
-import Mine from '@/components/Mine.vue';
+import Summary from '@/pages/Summary.vue';
+import Home from '@/pages/Home.vue';
+import Mine from '@/pages/Mine.vue';
 import { ref, reactive } from 'vue';
 import 'vant/es/toast/style';
 import 'vant/es/notify/style'
