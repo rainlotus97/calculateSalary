@@ -1,83 +1,100 @@
-import { defineStore } from 'pinia';
+import { defineStore } from "pinia";
 import { SalaryState, calculateDateSort } from "@/common";
-import { reactive } from 'vue';
+import { reactive } from "vue";
+import { SalaryStateInterface } from "@/types/Salary";
 
-
-export const salaryStore = defineStore('salary', {
-    state: () => {
-        return {
-            checkOutNum: 0,
-            extendNum: 0,
-            checkOutSalary: 0,
-            extendSalary: 0,
-            foodPrice: 0,
-            daySalaryList: reactive([] as SalaryState[]),
-            date: ''
-        }
+const state: SalaryStateInterface = {
+  checkOutNum: 0,
+  extendNum: 0,
+  checkOutSalary: 0,
+  extendSalary: 0,
+  foodPrice: 0,
+  daySalaryList: reactive([]),
+  date: "",
+  currentEdit: "checkOut",
+};
+export const salaryStore = defineStore("salary", {
+  state: () => {
+    return state;
+  },
+  actions: {
+    setCheckOutNum(checkOutNum: number) {
+      this.checkOutNum = checkOutNum;
     },
-    actions: {
-        setCheckOutNum(checkOutNum: number) {
-            this.checkOutNum = checkOutNum
-        },
-        setExtendNum(extendNum: number) {
-            this.extendNum = extendNum
-        },
-        setCheckOutSalary(checkOutSalary: number) {
-            this.checkOutSalary = checkOutSalary
-        },
-        setExtendSalary(extendSalary: number) {
-            this.extendSalary = extendSalary
-        },
-        setFoodPrice(foodPrice: number) {
-            this.foodPrice = foodPrice
-        },
-        addDaySalary(daySalary: SalaryState) {
-            // 如果存在相同的数据，则保留最新的数据
-            const index = this.daySalaryList.findIndex(item => item.date.trim() === daySalary.date.trim())
-            console.log('current daySalaryList in list index is: ', index);
-            if (index !== -1) {
-                if (daySalary.salary === 0) {
-                    this.daySalaryList.splice(index, 1)
-                } else {
-                    this.daySalaryList.splice(index, 1, daySalary)
-                }
-            } else {
-                this.daySalaryList.push(daySalary)
-            }
-            // 按日期排序
-            this.daySalaryList.sort((a, b) => {
-                return calculateDateSort(a.date) < calculateDateSort(b.date) ? 1 : -1
-            })
-        },
-        deleteDaySalary(date: string) {
-            // 删除指定日期的数据
-            const index = this.daySalaryList.findIndex(item => item.date.trim() === date.trim())
-            if (index !== -1) {
-                this.daySalaryList.splice(index, 1)
-            }
-        },
-        clear() {
-            this.checkOutNum = 0
-            this.extendNum = 0
-            this.daySalaryList = reactive([])
-        },
-        reset() {
-            this.checkOutSalary = 0
-            this.extendSalary = 0
-            this.foodPrice = 0
-        },
-        resetTotal() {
-            this.checkOutNum = 0
-            this.extendNum = 0
-        },
-        setDate(date: string) {
-            this.date = date
-        }
+    setExtendNum(extendNum: number) {
+      this.extendNum = extendNum;
     },
-    persist: {
-        key: 'salary',
-        storage: localStorage,
-        paths: ['checkOutNum', 'extendNum', 'checkOutSalary', 'extendSalary', 'daySalaryList', 'date', 'foodPrice']
-    }
-
-})
+    setCheckOutSalary(checkOutSalary: number) {
+      this.checkOutSalary = checkOutSalary;
+    },
+    setExtendSalary(extendSalary: number) {
+      this.extendSalary = extendSalary;
+    },
+    setFoodPrice(foodPrice: number) {
+      this.foodPrice = foodPrice;
+    },
+    setCurrentEdit(currentEdit: string) {
+      this.currentEdit = currentEdit;
+    },
+    addDaySalary(daySalary: SalaryState) {
+      // 如果存在相同的数据，则保留最新的数据
+      const index = this.daySalaryList.findIndex(
+        (item) => item.date.trim() === daySalary.date.trim()
+      );
+      console.log("current daySalaryList in list index is: ", index);
+      if (index !== -1) {
+        if (daySalary.salary === 0) {
+          this.daySalaryList.splice(index, 1);
+        } else {
+          this.daySalaryList.splice(index, 1, daySalary);
+        }
+      } else {
+        this.daySalaryList.push(daySalary);
+      }
+      // 按日期排序
+      this.daySalaryList.sort((a, b) => {
+        return calculateDateSort(a.date) < calculateDateSort(b.date) ? 1 : -1;
+      });
+    },
+    deleteDaySalary(date: string) {
+      // 删除指定日期的数据
+      const index = this.daySalaryList.findIndex(
+        (item) => item.date.trim() === date.trim()
+      );
+      if (index !== -1) {
+        this.daySalaryList.splice(index, 1);
+      }
+    },
+    clear() {
+      this.checkOutNum = 0;
+      this.extendNum = 0;
+      this.daySalaryList = reactive([]);
+    },
+    reset() {
+      this.checkOutSalary = 0;
+      this.extendSalary = 0;
+      this.foodPrice = 0;
+    },
+    resetTotal() {
+      this.checkOutNum = 0;
+      this.extendNum = 0;
+    },
+    setDate(date: string) {
+      this.date = date;
+    },
+  },
+  persist: {
+    key: "salary",
+    storage: localStorage,
+    paths: [
+      "checkOutNum",
+      "extendNum",
+      "checkOutSalary",
+      "extendSalary",
+      "daySalaryList",
+      "date",
+      "foodPrice",
+      "currentEdit",
+    ],
+  },
+});
