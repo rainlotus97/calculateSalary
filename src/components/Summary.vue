@@ -200,7 +200,7 @@ const showDetail = (item: SalaryState) => {
     .detail_popup {
         width: 90%;
         max-height: calc(100% - 32px);
-        padding: 16px;
+        padding: 16px 0;
         overflow: auto;
         background-color: antiquewhite;
 
