@@ -17,13 +17,26 @@
         </div>
 
         <div class="show-list">
-            <div class="show-item" v-for="item, index in currentList" :key="index">
+            <div class="show-item" v-for="item, index in currentList" :key="index" @click="showDetail(item)">
                 <van-cell-group inset>
                     <van-cell title="日期" :value="item.date" />
-                    <van-cell title="工资" :value="item.salary + item.extraPrice || 0 + ' 元'" />
+                    <van-cell title="工资" :value="item.salary + (item?.extraPrice || 0) + ' 元'" />
                 </van-cell-group>
             </div>
         </div>
+
+        <van-popup v-model:show="showCenter" round class="detail_popup">
+            <van-cell-group inset>
+                <van-cell title="日期" :value="showItem.date" />
+                <van-cell title="总工资" :value="showItem.salary + (showItem.extraPrice || 0) + ' 元'" />
+                <van-cell title="额外补贴" v-if="showItem.extraPrice" :value="showItem.extraPrice + ' 元'" />
+                <div class="detail_item" v-for="item in showItem.salaryFuncList" :key="item.key">
+                    <van-cell v-if="item.count > 0 && item.value > 0" :title="item.title + '工资'"
+                        :value="item.count * item.value + ' 元'"
+                        :label="item.title + '单价: ' + item.value + '元' + '&nbsp;&nbsp;' + item.title + '数: ' + item.count + '个'" />
+                </div>
+            </van-cell-group>
+        </van-popup>
     </div>
 </template>
     
@@ -93,7 +106,7 @@ const selectMonth = (text: string) => {
         daySalaryList.forEach((item: SalaryState) => {
             currenDatetList.push(item);
             totalDays.value += 1;
-            item.extraPrice = item.extraPrice || currentSalary.foodPrice || 0;
+            item.extraPrice = item.extraPrice || 0;
             totalSalaryAll.value += item.salary + item.extraPrice;
         });
     }
@@ -104,7 +117,7 @@ const selectMonth = (text: string) => {
             if (item.date.includes(dateKey)) {
                 currenDatetList.push(item);
                 totalDays.value += 1;
-                item.extraPrice = item.extraPrice || currentSalary.foodPrice || 0;
+                item.extraPrice = item.extraPrice || 0;
                 totalSalaryAll.value += item.salary + item.extraPrice;
             }
         });
@@ -115,7 +128,7 @@ const selectMonth = (text: string) => {
             if (calculateDateSort(item.date) >= calculateDateSort(dateKey)) {
                 currenDatetList.push(item);
                 totalDays.value += 1;
-                item.extraPrice = item.extraPrice || currentSalary.foodPrice || 0;
+                item.extraPrice = item.extraPrice || 0;
                 totalSalaryAll.value += item.salary + item.extraPrice;
             }
         });
@@ -124,7 +137,12 @@ const selectMonth = (text: string) => {
 
 }
 
-
+const showCenter = ref(false);
+let showItem: SalaryState = reactive<SalaryState>({ date: '', salary: 0, extraPrice: 0, salaryFuncList: [] });
+const showDetail = (item: SalaryState) => {
+    showCenter.value = true;
+    showItem = item;
+}
 </script>
     
 <style lang="less">
@@ -173,8 +191,23 @@ const selectMonth = (text: string) => {
         overflow: auto;
         height: calc(100vh - 258px);
         padding-bottom: 16px;
+
         .show-item {
             margin-top: 16px;
+        }
+    }
+
+    .detail_popup {
+        width: 90%;
+        max-height: calc(100% - 32px);
+        padding: 16px;
+        overflow: auto;
+        background-color: antiquewhite;
+
+        .detail_item {
+            .van-cell__title {
+                flex: 2 !important;
+            }
         }
     }
 }

@@ -1,36 +1,17 @@
 import { defineStore } from 'pinia';
-import { SalaryState, calculateDateSort } from "@/common";
+import { SalaryItem, SalaryState, calculateDateSort } from "@/common";
 import { reactive } from 'vue';
 
 
 export const salaryStore = defineStore('salary', {
     state: () => {
         return {
-            checkOutNum: 0,
-            extendNum: 0,
-            checkOutSalary: 0,
-            extendSalary: 0,
-            foodPrice: 0,
             daySalaryList: reactive([] as SalaryState[]),
-            date: ''
+            date: '',
+            salaryFuncList: reactive([] as SalaryItem[])
         }
     },
     actions: {
-        setCheckOutNum(checkOutNum: number) {
-            this.checkOutNum = checkOutNum
-        },
-        setExtendNum(extendNum: number) {
-            this.extendNum = extendNum
-        },
-        setCheckOutSalary(checkOutSalary: number) {
-            this.checkOutSalary = checkOutSalary
-        },
-        setExtendSalary(extendSalary: number) {
-            this.extendSalary = extendSalary
-        },
-        setFoodPrice(foodPrice: number) {
-            this.foodPrice = foodPrice
-        },
         addDaySalary(daySalary: SalaryState) {
             // 如果存在相同的数据，则保留最新的数据
             const index = this.daySalaryList.findIndex(item => item.date.trim() === daySalary.date.trim())
@@ -56,28 +37,35 @@ export const salaryStore = defineStore('salary', {
                 this.daySalaryList.splice(index, 1)
             }
         },
-        clear() {
-            this.checkOutNum = 0
-            this.extendNum = 0
-            this.daySalaryList = reactive([])
+        addSalaryFunc(salaryFunc: SalaryItem) {
+            const index = this.salaryFuncList.findIndex(item => item.key === salaryFunc.key)
+            if (index !== -1) {
+                this.salaryFuncList.splice(index, 1, salaryFunc)
+            } else {
+                this.salaryFuncList.push(salaryFunc)
+            }
         },
-        reset() {
-            this.checkOutSalary = 0
-            this.extendSalary = 0
-            this.foodPrice = 0
+        deleteSalaryFunc(key: string) {
+            const index = this.salaryFuncList.findIndex(item => item.key === key)
+            if (index !== -1) {
+                this.salaryFuncList.splice(index, 1)
+            }
         },
-        resetTotal() {
-            this.checkOutNum = 0
-            this.extendNum = 0
-        },
+        clear() { this.daySalaryList = [] },
         setDate(date: string) {
             this.date = date
+        },
+        setSalaryList(salaryList: SalaryState[]) {
+            this.daySalaryList = salaryList
+        },
+        setDaySalaryList(daySalaryList: SalaryState[]) {
+            this.daySalaryList = daySalaryList
         }
     },
     persist: {
         key: 'salary',
         storage: localStorage,
-        paths: ['checkOutNum', 'extendNum', 'checkOutSalary', 'extendSalary', 'daySalaryList', 'date', 'foodPrice']
+        paths: ['daySalaryList', 'date', 'salaryFuncList']
     }
 
 })

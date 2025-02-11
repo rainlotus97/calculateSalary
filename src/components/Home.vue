@@ -7,15 +7,15 @@
         <!-- 录入今日退房数据 -->
         <div class="main_title">
             <van-cell-group inset>
-                <van-cell title="退房数" :value="checkOut + ' 个'" @click="editCheckOut('checkOut')" />
-                <van-cell title="续住数" :value="extendStay + ' 个'" @click="editCheckOut('extendStay')" />
+                <van-cell v-for="item in salaryList" :key="item.key" :title="item.title + '数'" :value="item.count + ' 个'"
+                    @click="editCheckOut(item.key)" />
             </van-cell-group>
         </div>
 
         <!-- 今日工资 -->
         <div class="main_title">
             <van-cell-group inset>
-                <van-cell title="今日工资" :value="currentSalary + currentSalaryStore.foodPrice + ' 元'" />
+                <van-cell title="今日工资" :value="currentSalary + ' 元'" />
             </van-cell-group>
         </div>
 
@@ -40,10 +40,9 @@ import { showToast } from 'vant';
 import { SalaryState } from '@/common';
 const currentSalaryStore = salaryStore();
 
-const checkOut = ref(currentSalaryStore.checkOutNum);
-const extendStay = ref(currentSalaryStore.extendNum);
+const salaryList = ref(currentSalaryStore.salaryFuncList);
 
-let currentEdit = 'checkOut';
+let currentEdit = '';
 
 const show = ref(false);
 const editCheckOut = (value: string) => {
@@ -53,73 +52,85 @@ const editCheckOut = (value: string) => {
 let currentInputStr = ''
 const onInput = (value: string) => {
     currentInputStr += value;
-    if (currentEdit === 'checkOut') {
-        checkOut.value = Number(currentInputStr);
-        currentSalaryStore.setCheckOutNum(Number(currentInputStr));
-    } else {
-        extendStay.value = Number(currentInputStr);
-        currentSalaryStore.setExtendNum(Number(currentInputStr));
-    }
+    salaryList.value.forEach((item) => {
+        if (item.key === currentEdit) {
+            item.count = Number(currentInputStr);
+        }
+    });
 };
 const onDelete = () => {
     currentInputStr = currentInputStr.slice(0, -1);
-    if (currentEdit === 'checkOut') {
-        checkOut.value = Number(currentInputStr);
-        currentSalaryStore.setCheckOutNum(Number(currentInputStr));
-    } else {
-        extendStay.value = Number(currentInputStr);
-        currentSalaryStore.setExtendNum(Number(currentInputStr));
-    }
+    salaryList.value.forEach((item) => {
+        if (item.key === currentEdit) {
+            item.count = Number(currentInputStr);
+        }
+    });
 };
 const clearNumber = () => {
     currentInputStr = '';
     calculateSalary();
 };
 const reShowNumber = () => {
-    if (currentEdit === 'checkOut') {
-        currentInputStr = checkOut.value + '';
-    } else {
-        currentInputStr = extendStay.value + '';
-    }
+    salaryList.value.forEach((item) => {
+        if (item.key === currentEdit) {
+            currentInputStr = item.count + '';
+        }
+    });
 };
 
 const currentSalary = ref(0);
 const calculateSalary = () => {
-    const checkOutPrice = currentSalaryStore.checkOutSalary;
-    const extendStayPrice = currentSalaryStore.extendSalary;
-    if (checkOutPrice === 0 || extendStayPrice === 0) {
-        showToast('请设置退房单价和续住单价');
+    if (salaryList.value.length === 0) {
+        showToast('请添加方案');
         return;
     }
-    if (checkOut.value === 0 && extendStay.value === 0) {
+    const isNotSet = salaryList.value.every((item) => item.count === 0);
+    if (isNotSet) {
         console.log('没有记录工资，无需计算');
         return;
     }
-    currentSalary.value = checkOut.value * checkOutPrice + extendStay.value * extendStayPrice;
+    currentSalary.value = salaryList.value.reduce((pre, cur) => {
+        return pre + cur.count * cur.value;
+    }, 0);
     let daliySalary: SalaryState = {
         date: getCurrentTime(),
         salary: currentSalary.value,
-        extraPrice: currentSalaryStore.foodPrice,
+        extraPrice: 0,
+        salaryFuncList: salaryList.value,
     }
     currentSalaryStore.addDaySalary(daliySalary);
 };
 
 onMounted(() => {
+    clearStore();
     let currentDate = getCurrentTime();
     if (currentSalaryStore.date !== currentDate) {
-        currentSalaryStore.resetTotal();
-        checkOut.value = 0;
-        extendStay.value = 0;
+        salaryList.value.forEach((item) => {
+            item.count = 0;
+        });
         currentSalaryStore.setDate(currentDate);
     }
     calculateSalary();
 });
 
+// 初始化时，缓存数据兼容，清除不需要的缓存条目
+const clearStore = () => {
+    let salaryLocalData = JSON.parse(localStorage.getItem('salary') as string);
+    if (salaryLocalData.hasOwnProperty('checkOutSalary')) {
+        console.log('曾经存在数据，需要数据兼容');
+        let salaryList = salaryLocalData['salaryList'] || [];
+        let daySalaryList = salaryLocalData['daySalaryList'] || [];
+        localStorage.clear();
+        currentSalaryStore.setSalaryList(salaryList);
+        currentSalaryStore.setDaySalaryList(daySalaryList);
+    }
+};
+
+
 const resetNum = () => {
-    checkOut.value = 0;
-    extendStay.value = 0;
-    currentSalary.value = 0;
-    currentSalaryStore.resetTotal();
+    salaryList.value.forEach((item) => {
+        item.count = 0;
+    });
 };
 
 // 获取当前时间

@@ -1,12 +1,31 @@
 <template>
     <div class="mine">
-        <div class="main_title">
+        <div class="main_add">
             <van-cell-group inset>
-                <van-cell title="退房单价" :value="checkOut + ' 元'" @click="editCheckOut('checkOut')" />
-                <van-cell title="续住单价" :value="extendStay + ' 元'" @click="editCheckOut('extendStay')" />
-                <van-cell title="餐补单价" :value="foodPrice + ' 元'" @click="editCheckOut('foodPrice')" />
+                <div class="salary_item" v-for="item in salaryList" :key="item.key">
+                    <van-swipe-cell>
+                        <van-cell :title="item.title + '单价'" :value="item.value + ' 元'" @click="editCheckOut(item.key)" />
+                        <template #right>
+                            <van-button square type="danger" text="删除" @click="delSalaryItem(item.key)" />
+                        </template>
+                    </van-swipe-cell>
+                </div>
             </van-cell-group>
+            <van-cell-group inset v-if="isShowNew" :class="{ mt16: salaryList.length }">
+                <van-field v-model="salaryTitle" label="标题" />
+                <van-field v-model="salaryKey" label="关键词" />
+                <van-field v-model="salaryValue" type="digit" label="数值" />
+            </van-cell-group>
+
+            <div class="main_plus" :class="{ mt16: salaryList.length }" v-show="!isShowNew">
+                <van-button icon="plus" type="primary" @click="addList">添加方案</van-button>
+            </div>
+            <div class="main_plus_cancel" v-show="isShowNew">
+                <van-button type="danger" @click="cancelAdd">取消</van-button>
+                <van-button type="primary" @click="confirmAdd">确认</van-button>
+            </div>
         </div>
+
         <div class="clear-all">
             <van-cell-group inset>
                 <van-cell title="重置单价" @click="resetStore" />
@@ -28,15 +47,10 @@
                     <!-- 日 -->
                     <van-field v-model="dayNumber" label="日" />
                     <!-- 退房数 -->
-                    <van-field v-model="checkOutNumber" label="退房数" />
-                    <!-- 续住数 -->
-                    <van-field v-model="extendStayNumber" label="续住数" />
-                    <!-- 退房单价 -->
-                    <van-field v-model="checkOutPrice" label="退房单价" />
-                    <!-- 续住单价 -->
-                    <van-field v-model="extendStayPrice" label="续住单价" />
-                    <!-- 餐补单价 -->
-                    <van-field v-model="foodExtraPrice" label="餐补单价" />
+                    <van-field v-for="item in addSalaryList" :key="item.key" v-model="item.inputStr"
+                        :label="item.title + '数'" />
+                    <van-field v-for="item in addSalaryList" :key="item.key" v-model="item.value" type="digit"
+                        :label="item.title + '单价'" />
                 </van-cell-group>
 
                 <van-button type="primary" block @click="addSalary">添加</van-button>
@@ -63,15 +77,52 @@
 </template>
     
 <script setup lang='ts'>
+import { SalaryItem } from '@/common';
 import { salaryStore } from '@/stores/Salary';
 import { ref } from 'vue';
 const currentSalary = salaryStore();
 
-const checkOut = ref(currentSalary.checkOutSalary);
-const extendStay = ref(currentSalary.extendSalary);
-const foodPrice = ref(currentSalary.foodPrice || 0);
+const salaryTitle = ref('');
+const salaryKey = ref('');
+const salaryValue = ref('');
+const isShowNew = ref(false);
+const salaryList = ref<SalaryItem[]>(currentSalary.salaryFuncList);
+let addSalaryList = ref<SalaryItem[]>([]);
 
-let currentEdit = 'checkOut';
+const addList = () => {
+    isShowNew.value = true;
+    console.info('addList');
+};
+
+const cancelAdd = () => {
+    isShowNew.value = false;
+    salaryKey.value = '';
+    salaryTitle.value = '';
+    salaryValue.value = '';
+};
+
+const confirmAdd = () => {
+    const salayItem: SalaryItem = {
+        title: salaryTitle.value,
+        key: salaryKey.value,
+        value: Number(salaryValue.value),
+        count: 0,
+        inputStr: '',
+    }
+    salaryList.value.push(salayItem);
+    currentSalary.addSalaryFunc(salayItem);
+    isShowNew.value = false;
+    salaryKey.value = '';
+    salaryTitle.value = '';
+    salaryValue.value = '';
+    console.info('confirmAdd');
+};
+
+const delSalaryItem = (key: string) => {
+    salaryList.value = salaryList.value.filter((item) => item.key !== key);
+    currentSalary.deleteSalaryFunc(key);
+};
+let currentEdit = '';
 
 const show = ref(false);
 const editCheckOut = (value: string) => {
@@ -90,43 +141,40 @@ const onDelete = () => {
 };
 
 const calculateSalary = () => {
-    if (currentEdit === 'checkOut') {
-        checkOut.value = Number(currentInputStr);
-        currentSalary.setCheckOutSalary(Number(currentInputStr));
-    } else if (currentEdit === 'extendStay') {
-        extendStay.value = Number(currentInputStr);
-        currentSalary.setExtendSalary(Number(currentInputStr));
-    } else {
-        foodPrice.value = Number(currentInputStr);
-        currentSalary.setFoodPrice(Number(currentInputStr));
-    }
+    salaryList.value.forEach((item) => {
+        if (item.key === currentEdit) {
+            item.value = Number(currentInputStr);
+        }
+    });
 };
 
 const clearNumber = () => {
     currentInputStr = '';
 };
 const reShowNumber = () => {
-    if (currentEdit === 'checkOut') {
-        currentInputStr = checkOut.value + '';
-    } else if (currentEdit === 'extendStay') {
-        currentInputStr = extendStay.value + '';
-    } else {
-        currentInputStr = foodPrice.value + '';
-    }
+    salaryList.value.forEach((item) => {
+        if (item.key === currentEdit) {
+            currentInputStr = item.value + '';
+        }
+    });
 };
 
 const clearStore = () => {
     currentSalary.clear();
 };
 const resetStore = () => {
-    currentSalary.reset();
-    checkOut.value = 0;
-    extendStay.value = 0;
-    foodPrice.value = 0;
+    salaryList.value.forEach((item) => {
+        item.value = 0;
+    });
 };
 const popShow = ref(false);
 const showPopUp = () => {
     popShow.value = true;
+    addSalaryList = ref<SalaryItem[]>(JSON.parse(JSON.stringify(salaryList.value)));
+    addSalaryList.value.forEach((item) => {
+        item.count = 0;
+        item.inputStr = '';
+    });
 };
 
 const popShow2 = ref(false);
@@ -137,20 +185,20 @@ const deletePop = () => {
 const yearNumber = ref(new Date().getFullYear() + '');
 const monthNumber = ref('');
 const dayNumber = ref('');
-const checkOutNumber = ref('');
-const extendStayNumber = ref('');
-const checkOutPrice = ref('12');
-const extendStayPrice = ref('6');
-const foodExtraPrice = ref('15');
 
 // 添加/删除工资记录
 const addSalary = () => {
     let date = yearNumber.value + ' 年 ' + monthNumber.value + ' 月 ' + dayNumber.value + ' 日';
-    let salary = Number(checkOutNumber.value) * Number(checkOutPrice.value) + Number(extendStayNumber.value) * Number(extendStayPrice.value);
+    let salary = 0;
+    addSalaryList.value.forEach((item) => {
+        item.count = Number(item.inputStr);
+        item.inputStr = '';
+        salary += item.count * item.value;
+    });
     if (salary === 0) {
         currentSalary.deleteDaySalary(date);
     } else {
-        currentSalary.addDaySalary({ date, salary, extraPrice: Number(foodExtraPrice.value) });
+        currentSalary.addDaySalary({ date, salary, extraPrice: 0, salaryFuncList: addSalaryList.value });
     }
     popShow.value = false;
 };
@@ -168,8 +216,19 @@ const deleteSalary = () => {
     
 <style scoped lang="less">
 .mine {
-    .main_title {
+    .mt16 {
         margin-top: 16px;
+    }
+
+    .main_plus {
+        display: flex;
+        justify-content: center;
+    }
+
+    .main_plus_cancel {
+        margin-top: 16px;
+        display: flex;
+        justify-content: space-evenly;
     }
 
     .clear-all {
