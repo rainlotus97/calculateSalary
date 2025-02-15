@@ -9,10 +9,11 @@ import 'vant/es/notify/style'
 const tabBar = reactive([
   { icon: 'home-o', text: '首页' },
   { icon: 'add-o', text: '记账' },
+  { icon: 'wap-home-o', text: '登记' },
   { icon: 'user-o', text: '我的' },
 ]);
 
-const active = ref(1);
+const active = ref(2);
 </script>
 
 <template>
@@ -28,6 +29,9 @@ const active = ref(1);
       </div>
       <div v-else-if="active === 1">
         <Home></Home>
+      </div>
+      <div v-else-if="active === 2">
+        <Register></Register>
       </div>
       <div v-else>
         <Mine></Mine>

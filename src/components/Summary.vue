@@ -5,6 +5,8 @@
                 :key="index" @click="selectOne(item)">
                 {{ item.text }}
             </div>
+            <van-calendar v-model:show="showCalendar" ref="calendarRef" switch-mode="month" type="range"
+                @confirm="onConfirm" />
         </div>
 
         <div class="total-num">
@@ -44,24 +46,46 @@
 import { ref } from 'vue';
 import { salaryStore } from '@/stores/Salary';
 import { reactive } from 'vue';
-import { SalaryState, calculateDateSort } from '@/common';
+import { SalaryState, TimeType, calculateDateSort } from '@/common';
 import { onMounted } from 'vue';
+import type { CalendarInstance } from 'vant';
+
+const calendarRef = ref<CalendarInstance>();
 
 const currentSalary = salaryStore();
 
-const showList = reactive([
+const showList = reactive<TimeType[]>([
     { text: '本月工资', select: true },
     { text: '上月工资', select: false },
     { text: '半年工资', select: false },
     { text: '一年工资', select: false },
     { text: '全部工资', select: false },
+    { text: '选择时间', select: false },
 ]);
 
 const totalDays = ref(0);
 const totalSalaryAll = ref(0);
 const currentList = reactive<SalaryState[]>([]);
+const showCalendar = ref(false);
+const onConfirm = (values: [Date, Date]) => {
+    const [start, end] = values;
+    showCalendar.value = false;
+    // 计算时间段内的数据
+    let currenDatetList: SalaryState[] = [];
+    currentSalary.daySalaryList.forEach((item: SalaryState) => {
+        const targetDate = calculateDateSort(item.date);
+        if (targetDate >= start && targetDate <= end) {
+            currenDatetList.push(item);
+            totalDays.value += 1;
+            item.extraPrice = item.extraPrice || 0;
+            totalSalaryAll.value += item.salary + item.extraPrice;
+        }
+    });
+    currentList.push(...currenDatetList);
+    calendarRef.value?.reset();
+};
 
-const selectOne = (item: any) => {
+const selectOne = (item: TimeType) => {
     showList.forEach((i) => {
         i.select = false;
     });
@@ -122,6 +146,9 @@ const selectMonth = (text: string) => {
             }
         });
     }
+    else if (text === '选择时间') {
+        showCalendar.value = true;
+    }
     else {
         let dateKey = year + ' 年 ' + month + ' 月' + ' 1 日';
         daySalaryList.forEach((item: SalaryState) => {
@@ -130,7 +157,7 @@ const selectMonth = (text: string) => {
                 totalDays.value += 1;
                 item.extraPrice = item.extraPrice || 0;
                 totalSalaryAll.value += item.salary + item.extraPrice;
-            }
+            }4
         });
     }
     currentList.push(...currenDatetList);
@@ -145,7 +172,7 @@ const showDetail = (item: SalaryState) => {
 }
 </script>
     
-<style lang="less">
+<style lang="less" scoped>
 .summary {
     padding: 0 16px 50px;
 
@@ -190,7 +217,7 @@ const showDetail = (item: SalaryState) => {
         margin-top: 16px;
         overflow: auto;
         height: calc(100vh - 258px);
-        padding-bottom: 16px;
+        padding-bottom: 50px;
 
         .show-item {
             margin-top: 16px;
@@ -205,7 +232,7 @@ const showDetail = (item: SalaryState) => {
         background-color: antiquewhite;
 
         .detail_item {
-            .van-cell__title {
+            :deep(.van-cell__title) {
                 flex: 2 !important;
             }
         }

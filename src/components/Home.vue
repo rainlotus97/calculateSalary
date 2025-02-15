@@ -19,7 +19,7 @@
             </van-cell-group>
         </div>
 
-        <div class="main_title">
+        <div class="main_title position_bottom">
             <van-cell-group inset>
                 <van-cell title="重置个数" @click="resetNum" />
             </van-cell-group>
@@ -37,7 +37,7 @@ import { onMounted } from 'vue';
 import { ref } from 'vue';
 import { salaryStore } from '@/stores/Salary';
 import { showToast } from 'vant';
-import { SalaryState } from '@/common';
+import { SalaryState, getCurrentTime } from '@/common';
 const currentSalaryStore = salaryStore();
 
 const salaryList = ref(currentSalaryStore.salaryFuncList);
@@ -116,7 +116,7 @@ onMounted(() => {
 // 初始化时，缓存数据兼容，清除不需要的缓存条目
 const clearStore = () => {
     let salaryLocalData = JSON.parse(localStorage.getItem('salary') as string);
-    if (salaryLocalData.hasOwnProperty('checkOutSalary')) {
+    if (salaryLocalData?.hasOwnProperty('checkOutSalary')) {
         console.log('曾经存在数据，需要数据兼容');
         let salaryList = salaryLocalData['salaryList'] || [];
         let daySalaryList = salaryLocalData['daySalaryList'] || [];
@@ -131,22 +131,21 @@ const resetNum = () => {
     salaryList.value.forEach((item) => {
         item.count = 0;
     });
-};
-
-// 获取当前时间
-const getCurrentTime = () => {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    return `${year} 年 ${month} 月 ${day} 日`;
+    currentSalaryStore.deleteDaySalary(getCurrentTime());
 };
 </script>
     
-<style lang="less">
+<style lang="less" scoped>
 .home {
     height: 100%;
     overflow: hidden;
+
+    .position_bottom {
+        position: absolute;
+        left: 0;
+        bottom: 100px;
+        width: 100%;
+    }
 
     .current_time {
         font-size: 30px;

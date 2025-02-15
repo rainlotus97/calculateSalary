@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { SalaryItem, SalaryState, calculateDateSort } from "@/common";
+import { RoomInfo, SalaryItem, SalaryState, calculateDateSort } from "@/common";
 import { reactive } from 'vue';
 
 
@@ -8,7 +8,8 @@ export const salaryStore = defineStore('salary', {
         return {
             daySalaryList: reactive([] as SalaryState[]),
             date: '',
-            salaryFuncList: reactive([] as SalaryItem[])
+            salaryFuncList: reactive([] as SalaryItem[]),
+            roomList: reactive([] as RoomInfo[]),
         }
     },
     actions: {
@@ -60,12 +61,27 @@ export const salaryStore = defineStore('salary', {
         },
         setDaySalaryList(daySalaryList: SalaryState[]) {
             this.daySalaryList = daySalaryList
+        },
+        setRoomList(roomList: RoomInfo[]) {
+            this.roomList = roomList
+        },
+        syncFuncList(roomInfoList: RoomInfo[]) {
+            this.salaryFuncList.forEach(item => {
+                // 计算当前功能的数量
+                let sumCount = 0
+                roomInfoList.forEach((roomInfo: RoomInfo) => {
+                    if (roomInfo.roomCleanState.roomState === item.key) {
+                        sumCount++
+                    }
+                })
+                item.count = sumCount;
+            })
         }
     },
     persist: {
         key: 'salary',
         storage: localStorage,
-        paths: ['daySalaryList', 'date', 'salaryFuncList']
+        paths: ['daySalaryList', 'date', 'salaryFuncList', 'roomList']
     }
 
 })

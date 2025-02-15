@@ -4,19 +4,20 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 0.0.0.0",
     "build": "vue-tsc && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "@vant/use": "^1.6.0",
     "amfe-flexible": "^2.2.1",
+    "html2canvas": "^1.4.1",
     "less": "^4.2.0",
     "less-loader": "^12.2.0",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.1",
     "postcss-pxtorem": "5.1.1",
-    "vant": "^4.8.10",
+    "vant": "^4.9.0",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },

@@ -6,6 +6,7 @@
                     <van-swipe-cell>
                         <van-cell :title="item.title + '单价'" :value="item.value + ' 元'" @click="editCheckOut(item.key)" />
                         <template #right>
+                            <van-button square :color="item.color || '#1989fa'" text="改变颜色" @click="editColor(item.key)" />
                             <van-button square type="danger" text="删除" @click="delSalaryItem(item.key)" />
                         </template>
                     </van-swipe-cell>
@@ -15,6 +16,7 @@
                 <van-field v-model="salaryTitle" label="标题" />
                 <van-field v-model="salaryKey" label="关键词" />
                 <van-field v-model="salaryValue" type="digit" label="数值" />
+                <van-field v-model="salaryColor" label="颜色" />
             </van-cell-group>
 
             <div class="main_plus" :class="{ mt16: salaryList.length }" v-show="!isShowNew">
@@ -77,7 +79,7 @@
 </template>
     
 <script setup lang='ts'>
-import { SalaryItem } from '@/common';
+import { RoomInfo, SalaryItem, roomColorList } from '@/common';
 import { salaryStore } from '@/stores/Salary';
 import { ref } from 'vue';
 const currentSalary = salaryStore();
@@ -85,6 +87,7 @@ const currentSalary = salaryStore();
 const salaryTitle = ref('');
 const salaryKey = ref('');
 const salaryValue = ref('');
+const salaryColor = ref('');
 const isShowNew = ref(false);
 const salaryList = ref<SalaryItem[]>(currentSalary.salaryFuncList);
 let addSalaryList = ref<SalaryItem[]>([]);
@@ -99,6 +102,7 @@ const cancelAdd = () => {
     salaryKey.value = '';
     salaryTitle.value = '';
     salaryValue.value = '';
+    salaryColor.value = '';
 };
 
 const confirmAdd = () => {
@@ -106,6 +110,7 @@ const confirmAdd = () => {
         title: salaryTitle.value,
         key: salaryKey.value,
         value: Number(salaryValue.value),
+        color: salaryColor.value||'#1989fa',
         count: 0,
         inputStr: '',
     }
@@ -115,6 +120,7 @@ const confirmAdd = () => {
     salaryKey.value = '';
     salaryTitle.value = '';
     salaryValue.value = '';
+    salaryColor.value = '';
     console.info('confirmAdd');
 };
 
@@ -212,6 +218,27 @@ const deleteSalary = () => {
     popShow2.value = false;
 };
 
+
+const editColor = (key: string) => {
+    salaryList.value.forEach((item: SalaryItem) => {
+        if (item.key === key) {
+            // 随机颜色
+            let random = Math.floor(Math.random() * roomColorList.length);
+            item.color = roomColorList[random];
+            refreshColor(key, item.color);
+        }
+    });
+};
+
+// 刷新缓存中房间的颜色
+const refreshColor = (key: string, color: string) => {
+    let roomStateList = currentSalary.roomList;
+    roomStateList.forEach((item: RoomInfo) => {
+        if (item.roomCleanState.roomState === key) {
+            item.roomCleanState.roomColor = color;
+        }
+    });
+};
 </script>
     
 <style scoped lang="less">
@@ -233,6 +260,9 @@ const deleteSalary = () => {
 
     .clear-all {
         margin-top: 16px;
+    }
+    :deep(.van-swipe-cell__right){
+        display: flex;
     }
 }
 </style>
