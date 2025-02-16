@@ -132,6 +132,7 @@ const resetNum = () => {
         item.count = 0;
     });
     currentSalaryStore.deleteDaySalary(getCurrentTime());
+    currentSalary.value = 0;
 };
 </script>
     
